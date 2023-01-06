@@ -1,0 +1,45 @@
+@import '../../../node_modules/genesys-react-components/src/theme/variables.scss';
+
+.user-card {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	padding: 6px;
+	gap: 6px;
+	border-radius: 4px;
+	border: 1px solid var($--theme-core-control-border-color);
+	background-color: var($--theme-core-control-background-color);
+
+	&:hover {
+		background-color: var($--theme-core-control-hover-background-color);
+	}
+
+	&.clickable {
+		cursor: pointer;
+	}
+
+	.user-image {
+		height: 36px;
+		width: 36px;
+		border-radius: 36px;
+		margin: 6px;
+	}
+
+	.user-info {
+		display: flex;
+		flex-flow: column nowrap;
+
+		.name {
+			font-size: 16px;
+			color: var($--theme-core-control-punch-color);
+		}
+
+		.title {
+			font-size: 14px;
+		}
+
+		.department {
+			font-size: 12px;
+		}
+	}
+}
