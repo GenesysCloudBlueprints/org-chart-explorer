@@ -1,4 +1,5 @@
 // https://purecloudlabs.github.io/genesys-react-components/#/themes
+@import '../node_modules/genesys-react-components/src/theme/roboto.scss';
 @import '../node_modules/genesys-react-components/src/theme/typography.scss';
 @import '../node_modules/genesys-react-components/src/theme/variables.scss';
 
@@ -9,6 +10,7 @@ body,
 	height: 100vh;
 	margin: 0;
 	padding: 0;
+	font-family: 'Roboto';
 }
 
 // Apply theme colors to app-specific elements
@@ -42,6 +44,7 @@ body,
 
 		h1 {
 			flex-grow: 1;
+			font-weight: 300;
 		}
 
 		// Strip margins from all direct children

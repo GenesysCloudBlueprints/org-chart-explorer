@@ -45,4 +45,15 @@
 			}
 		}
 	}
+
+	.manager-icon {
+		margin: 6px 21px;
+		display: block;
+		font-size: 18px;
+		line-height: 0;
+	}
+
+	.target-user > .user-card {
+		border-color: var($--theme-core-punch-color);
+	}
 }

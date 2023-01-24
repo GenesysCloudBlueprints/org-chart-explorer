@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import GenesysCloudAPI from '../../helpers/GenesysCloudAPI';
+import { useEffect, useState } from 'react';
+import { useGenesysCloudAPI } from '../../helpers/GenesysCloudAPI';
 
 import { User } from '../../helpers/GenesysCloudAPITypes';
 import UserCard from '../usercard/UserCard';
@@ -8,24 +8,27 @@ import './OrgChartMember.scss';
 
 interface IProps {
 	user: User;
-	api: GenesysCloudAPI;
 	onClick?: { (user: User): void };
+	noChildren?: boolean;
+	className?: string;
 }
 
 export default function OrgChartMember(props: IProps) {
 	const [directReports, setDirectReports] = useState<User[]>();
+	const api = useGenesysCloudAPI();
 
 	useEffect(() => {
+		if (!api || props.noChildren) return;
 		(async () => {
-			const data = await props.api.GetDirectReports(props.user.id || '');
-			console.log('Direct reports', data);
+			setDirectReports(undefined);
+			const data = await api.GetDirectReports(props.user.id || '');
 			setDirectReports(data);
 		})();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [props.user]);
+	}, [props.user, api]);
 
 	return (
-		<div className="org-chart-member">
+		<div className={`org-chart-member ${props.className || ''}`}>
 			<UserCard
 				key={props.user.id}
 				user={props.user}
@@ -38,7 +41,6 @@ export default function OrgChartMember(props: IProps) {
 					{directReports.map((user) => (
 						<OrgChartMember
 							key={user.id}
-							api={props.api}
 							user={user}
 							onClick={(user) => {
 								console.log('CLICK!!!');
