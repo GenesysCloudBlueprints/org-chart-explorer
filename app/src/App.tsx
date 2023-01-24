@@ -28,10 +28,13 @@ function App() {
 
 	// On region changed
 	useEffect(() => {
-		if (!region) return;
+		if (!region) {
+			setRegion('mypurecloud.com');
+			return;
+		}
 
 		// Save region setting
-		localStorage.setItem(REGION_KEY, region || 'mypurecloud.com');
+		localStorage.setItem(REGION_KEY, region);
 
 		// Update region list to synchronize data items
 		const updatedRegions = [...regions];
