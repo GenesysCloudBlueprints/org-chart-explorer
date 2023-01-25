@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GenesysDevIcon, GenesysDevIcons } from 'genesys-dev-icons';
-import { DxTextbox, LoadingPlaceholder } from 'genesys-react-components';
+import { CopyButton, DxTextbox, LoadingPlaceholder } from 'genesys-react-components';
 import { stringify } from 'csv-stringify/browser/esm/sync';
 
 import { clearSubReports, useGenesysCloudAPI, useSubReports, useUserData } from '../../helpers/GenesysCloudAPI';
@@ -20,6 +20,7 @@ export default function OrgChart(props: IProps) {
 	const [targetUser, setTargetUser] = useState<User | undefined>(user);
 	const [superiors, setSuperiors] = useState<User[] | undefined>();
 	const subReports = useSubReports();
+	const [subReportsCsv, setSubReportsCsv] = useState<string>('');
 
 	const chooseUser = async (user?: User) => {
 		setTargetUser(user);
@@ -38,9 +39,33 @@ export default function OrgChart(props: IProps) {
 		})();
 	}, [api, targetUser]);
 
+	useEffect(() => {
+		(async () => setSubReportsCsv(await toCSV(subReports)))();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [subReports]);
+
 	if (!api) {
 		return <LoadingPlaceholder />;
 	}
+
+	const toCSV = async (users: User[]) => {
+		if (!users || users.length === 0) return '';
+		const resolveManager = async (managerId?: string) => {
+			if (managerId) {
+				const manager = await api.GetUser(managerId);
+				return manager ? manager.name : '';
+			}
+			return '';
+		};
+		const data = [];
+		for (let i = 0; i < users.length; i++) {
+			const user = users[i];
+			data.push([user.name, user.department, user.title, user.email, await resolveManager(user.manager?.id)]);
+		}
+		// const data = users.forEach((user) => [user.name, user.department, user.title, user.email, await resolveManager(user.manager?.id)]);
+		data.unshift(['Name', 'Department', 'Title', 'Email', 'Manager']);
+		return stringify(data);
+	};
 
 	return (
 		<div className="org-chart">
@@ -103,16 +128,15 @@ export default function OrgChart(props: IProps) {
 					))}
 				{targetUser && <OrgChartMember user={targetUser} onClick={(user) => chooseUser(user)} className="target-user" />}
 				<h2>Sub-report list</h2>
-				<pre>
-					<code>{toCSV(subReports)}</code>
-				</pre>
+				{subReportsCsv && (
+					<div className="csv-output">
+						<CopyButton copyText={subReportsCsv} className="csv-copy-button" />
+						<pre>
+							<code>{subReportsCsv}</code>
+						</pre>
+					</div>
+				)}
 			</div>
 		</div>
 	);
-}
-
-function toCSV(users: User[]) {
-	const data = users.map((user) => [user.name, user.department, user.title, user.email]);
-	data.unshift(['Name', 'Department', 'Title', 'Email']);
-	return stringify(data);
 }

@@ -23,6 +23,7 @@ export default class GenesysCloudAPI {
 	isRateLimited: boolean = false;
 	requestQueue: RetryableQueueItem[] = [];
 	processors: number = 0;
+	userCache: { [userId: string]: User | undefined } = {};
 
 	constructor(region: string) {
 		// Set region
@@ -73,6 +74,7 @@ export default class GenesysCloudAPI {
 		const res = await this.api.get('/api/v2/users/me');
 		if (isSuccess(res)) {
 			this.me = res.data as User;
+			this.addCachedUser(this.me);
 			setUserData(this.me);
 			return true;
 		} else {
@@ -120,17 +122,39 @@ export default class GenesysCloudAPI {
 		const res = await this.rateLimitRetryer(() => this.api.get(`/api/v2/users/${encodeURIComponent(userId)}/directreports`));
 		if (isSuccess(res) && res.data) {
 			const users = res.data as User[];
+			users.forEach(this.addCachedUser.bind(this));
 			addSubReports(users);
 			return users;
-		} else return undefined;
+		} else {
+			return undefined;
+		}
 	}
 
 	public async GetSuperiors(userId: string) {
 		if (!userId) return undefined;
 
 		const res = await this.rateLimitRetryer(() => this.api.get(`/api/v2/users/${encodeURIComponent(userId)}/superiors`));
-		if (isSuccess(res) && res.data) return res.data as User[];
-		else return undefined;
+		if (isSuccess(res) && res.data) {
+			const users = res.data as User[];
+			users.forEach(this.addCachedUser.bind(this));
+			return users;
+		} else {
+			return undefined;
+		}
+	}
+
+	public async GetUser(userId: string) {
+		// Return from cache
+		if (this.userCache[userId]) return this.userCache[userId];
+
+		const res = await this.rateLimitRetryer(() => this.api.get(`/api/v2/users/${encodeURIComponent(userId)}`));
+		if (isSuccess(res) && res.data) {
+			const user = res.data as User;
+			this.addCachedUser(user);
+			return user;
+		} else {
+			return undefined;
+		}
 	}
 
 	/////// PRIVATE METHODS ///////
@@ -206,6 +230,10 @@ export default class GenesysCloudAPI {
 	private setIsRateLimited(is: boolean) {
 		if (this.isRateLimited === is) return;
 		setRecoil(rateLimitAtom, is);
+	}
+
+	private addCachedUser(user: User) {
+		this.userCache[user.id] = user;
 	}
 }
 

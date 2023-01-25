@@ -2,7 +2,7 @@
 // https://github.com/MyPureCloud/platform-client-sdk-javascript/blob/master/build/index.d.ts
 
 export interface User {
-	id?: string;
+	id: string;
 	name?: string;
 	division?: Division;
 	chat?: Chat;

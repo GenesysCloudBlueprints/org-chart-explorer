@@ -56,4 +56,10 @@
 	.target-user > .user-card {
 		border-color: var($--theme-core-punch-color);
 	}
+
+	.csv-output > .tooltip-container {
+		float: right;
+		right: 6px;
+		top: 12px;
+	}
 }
