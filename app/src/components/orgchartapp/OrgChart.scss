@@ -60,6 +60,14 @@
 	.csv-output > .tooltip-container {
 		float: right;
 		right: 6px;
-		top: 12px;
+		top: 27px;
+
+		.icon {
+			color: var($--theme-core-link-color);
+
+			&:hover {
+				color: var($--theme-core-link-hover-color);
+			}
+		}
 	}
 }
