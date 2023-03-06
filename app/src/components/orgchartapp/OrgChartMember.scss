@@ -1,0 +1,10 @@
+@import '../../../node_modules/genesys-react-components/src/theme/variables.scss';
+
+.org-chart-member {
+	.direct-reports {
+		& > * {
+			position: relative;
+			margin: 12px 0 12px 36px;
+		}
+	}
+}

@@ -1,0 +1,73 @@
+@import '../../../node_modules/genesys-react-components/src/theme/variables.scss';
+
+.org-chart {
+	.controls {
+		display: flex;
+		flex-flow: row wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 20px;
+
+		& > * {
+			min-width: 300px;
+			flex-grow: 1;
+		}
+
+		.user-search {
+			position: relative;
+
+			.search-input {
+				margin: 0;
+			}
+
+			.search-results {
+				position: absolute;
+				left: 0;
+				right: 0;
+				z-index: 1;
+				display: flex;
+				flex-flow: column nowrap;
+				gap: 6px;
+				padding: 6px;
+				border-width: 0 1px 1px 1px;
+				border-style: solid;
+				border-color: var($--theme-core-control-border-color);
+				background-color: var($--theme-core-control-alt-background-color);
+			}
+
+			&.results-open {
+				.search-input {
+					.dx-textbox {
+						border-bottom-left-radius: 0;
+						border-bottom-right-radius: 0;
+					}
+				}
+			}
+		}
+	}
+
+	.manager-icon {
+		margin: 6px 21px;
+		display: block;
+		font-size: 18px;
+		line-height: 0;
+	}
+
+	.target-user > .user-card {
+		border-color: var($--theme-core-punch-color);
+	}
+
+	.csv-output > .tooltip-container {
+		float: right;
+		right: 6px;
+		top: 27px;
+
+		.icon {
+			color: var($--theme-core-link-color);
+
+			&:hover {
+				color: var($--theme-core-link-hover-color);
+			}
+		}
+	}
+}

@@ -1,0 +1,46 @@
+[
+	{
+		"label": "US East (Virginia)",
+		"value": "mypurecloud.com"
+	},
+	{
+		"label": "US West (Oregon)",
+		"value": "usw2.pure.cloud"
+	},
+	{
+		"label": "Canada (Central)",
+		"value": "cac1.pure.cloud"
+	},
+	{
+		"label": "Europe (Ireland)",
+		"value": "mypurecloud.ie"
+	},
+	{
+		"label": "Europe (London)",
+		"value": "euw2.pure.cloud"
+	},
+	{
+		"label": "Europe (Frankfurt)",
+		"value": "mypurecloud.de"
+	},
+	{
+		"label": "Asia Pacific (Mumbai)",
+		"value": "aps1.pure.cloud"
+	},
+	{
+		"label": "Asia Pacific (Tokyo)",
+		"value": "mypurecloud.jp"
+	},
+	{
+		"label": "Asia Pacific (Seoul)",
+		"value": "apne2.pure.cloud"
+	},
+	{
+		"label": "Asia Pacific (Sydney)",
+		"value": "mypurecloud.com.au"
+	},
+	{
+		"label": "South America (São Paulo)",
+		"value": "sae1.pure.cloud"
+	}
+]

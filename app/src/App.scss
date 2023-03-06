@@ -1,0 +1,63 @@
+// https://purecloudlabs.github.io/genesys-react-components/#/themes
+@import '../node_modules/genesys-react-components/src/theme/roboto.scss';
+@import '../node_modules/genesys-react-components/src/theme/typography.scss';
+@import '../node_modules/genesys-react-components/src/theme/variables.scss';
+
+html,
+body,
+.org-chart-explorer {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	font-family: 'Roboto';
+}
+
+// Apply theme colors to app-specific elements
+.org-chart-explorer {
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: stretch;
+	justify-content: stretch;
+
+	// Define classes for the light and dark themes
+	&.theme-light {
+		@include writeCssVars($theme-vars);
+	}
+	&.theme-dark {
+		@include writeCssVars($theme-vars-dark);
+	}
+
+	// Set app-wide theme colors
+	background-color: var($--theme-core-background-color);
+	color: var($--theme-core-text-color);
+
+	.header {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: flex-start;
+		align-items: center;
+		gap: 30px;
+		padding: 12px;
+		border-bottom: 1px solid var($--theme-core-layout-border-color);
+		box-shadow: 0 2px 10px var(--theme-core-box-shadow-color);
+
+		h1 {
+			flex-grow: 1;
+			font-weight: 300;
+		}
+
+		// Strip margins from all direct children
+		& > * {
+			margin: 0;
+		}
+	}
+
+	.app {
+		overflow: auto;
+		width: 100%;
+		max-width: 1200px;
+		height: 100%;
+		margin: 0 auto;
+	}
+}
