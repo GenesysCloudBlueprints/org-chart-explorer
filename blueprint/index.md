@@ -16,9 +16,68 @@ Try this blueprint live in your browser with your org's data, no setup required!
 
 ![Org Chart Explorer](org-chart-explorer.png)
 
+## Scenario
+
+Custom applications may be interested in understanding the managerial relationships between users in Genesy Cloud. This use case requires identifying a user as a starting point, then obtaining the user's upward management chain (superiors) and the organizational tree below them (direct reports). 
+
+## Solution
+
+This blueprint explains how to use the following Genesys Cloud concepts:
+
+* [Genesys Cloud OAuth Implicit Grant](/authorization/platform-auth/use-implicit-grant) - Using OAuth's implicit grant to authorize 3rd party applications to use the Genesys Cloud Platform API
+* [Genesys Cloud Users API](/useragentman/users/) - Platform API endpoints for working with Genesys Cloud user configuration
+* Rate Limiting - handling rate limiting as an expected feature of the Platform API
+
+## Solution Components
+
+* [React](https://react.dev/) - a popular frontend web application framework
+* [Genesys Cloud Platform API](/platform/api/) - the REST API for Genesys Cloud
+
+## Software Development Kits
+
+This blueprint interacts with the Genesys Cloud API directly without the usage of the [JavaScript Platform Client SDK](/devapps/sdk/docexplorer/purecloudjavascript/). This was primarialy an architectural decision due to a new behavior in React 18 relating to dependency processing with webpack. The short description is that the SDK unfortunatley requires some node.js polyfills and React's webpack config doesn't handle this automatically anymore and now requires ejecting to edit the webpack config. For prior versions of React, usage was fairly straightforward, as demonstrated in the blueprint [Develop a React app with Typescript that uses the Genesys Cloud Platform SDK](/blueprints/react-app-with-genesys-cloud-sdk/). Future iterations of the JS SDK intend to remedy this situation with a more web-friendly package.
+
+The API types in `app/src/helpers/GenesysCloudAPITypes.ts` were copied from the JavaScript SDK's `index.d.ts` file to make use of the SDK's model types even though the SDK itself wasn't used.
+
+## Prerequisites
+
+### Specialized knowledge
+
+- Experience with TypeScript and React
+- Basic understanding of Genesys Cloud terminology
+
+### Genesys Cloud account
+
+* A Genesys Cloud license. For more information see, [Genesys Cloud Pricing](https://www.genesys.com/pricing "Opens the Genesys Cloud pricing page") in the Genesys website. 
+
+### Development tools running in your local environment
+
+* [NodeJS](https://nodejs.org/) - app uses v18
+
 ## Application Overview
 
 The web application is a client side app built using [TypeScript](https://www.typescriptlang.org/) and [React](https://reactjs.org/). The source code for the app is open source and can be found on GitHub in [org-chart-explorer/app](https://github.com/GenesysCloudBlueprints/org-chart-explorer/tree/main/app).
+
+:::info
+Try this blueprint live in your browser with your org's data, no setup required! Hosted using Github Pages: [https://genesyscloudblueprints.github.io/org-chart-explorer/](https://genesyscloudblueprints.github.io/org-chart-explorer/).
+:::
+
+### Running Locally
+
+The app is run locally using React's built-in local server. In your local shell, switch to the `app` directory and install dependencies:
+
+```sh
+cd app
+npm i
+```
+
+Then start the service:
+
+```sh
+npm run start
+```
+
+If you didn't change the default port, the app will be available locally on your machine at http://localhost:3000/.
 
 ### Dependencies
 
@@ -29,12 +88,6 @@ Before digging into the application itself, here are some notable packages used 
 * [React Router](https://reactrouter.com/) - a library for React to manage URL-based routing within a single page app
 * [Recoil](https://recoiljs.org/) - a state management library for React, but less opinionated than Redux and offers a shim to interact with state objects outside of components via [recoil-nexus](https://www.npmjs.com/package/recoil-nexus)
 * [axios](https://axios-http.com/docs/intro) - a HTTP client
-
-### Genesys Cloud API, JS SDK, and React 18
-
-This blueprint interacts with the Genesys Cloud API directly without the usage of the [JavaScript Platform Client SDK](/devapps/sdk/docexplorer/purecloudjavascript/). This was primarialy an architectural decision due to a new behavior in React 18 relating to dependency processing with webpack. The short description is that the SDK unfortunatley requires some node.js polyfills and React's webpack config doesn't handle this automatically anymore and now requires ejecting to edit the webpack config. For prior versions of React, usage was fairly straightforward, as demonstrated in the blueprint [Develop a React app with Typescript that uses the Genesys Cloud Platform SDK](/blueprints/react-app-with-genesys-cloud-sdk/). Future iterations of the JS SDK intend to remedy this situation with a more web-friendly package.
-
-The API types in `app/src/helpers/GenesysCloudAPITypes.ts` were copied from the JavaScript SDK's `index.d.ts` file to make use of the SDK's model types even though the SDK itself wasn't used.
 
 ## App Authorization
 
@@ -175,3 +228,18 @@ private async rateLimitRetryerImpl(requestFunc: { (): Promise<AxiosResponse<any,
 But wait, isn't JavaScript single threaded? Why queue requests and use a pool of workers when you only have one thread? 
 
 Good question! While it is true that JavaScript is single threaded, API requests take some amount of time to execute and JavaScript releases its thread to process other tasks on its callstack. When the API request completes, the browser puts the callback on JavaScript's callstack to be processed when the thread is available again. This always async nature means we can simulate threading by using the processing time in between request and response to additional processing.
+
+## Additional resources
+
+* [Genesys Cloud Platform API](/platform/api/)
+* [Genesys Cloud Users API resources](/useragentman/users/)
+* [org-chart-explorer](https://genesyscloudblueprints.github.io/org-chart-explorer/)
+* [Genesys Cloud OAuth Implicit Grant](/authorization/platform-auth/use-implicit-grant)
+* [React](https://react.dev/)
+* [NodeJS](https://nodejs.org/)
+* [TypeScript](https://www.typescriptlang.org/) 
+* [Genesys React Components](https://purecloudlabs.github.io/genesys-react-components/)
+* [Genesys Dev Icon Pack](https://purecloudlabs.github.io/genesys-dev-icon-pack/)
+* [React Router](https://reactrouter.com/)
+* [Recoil](https://recoiljs.org/)
+* [axios](https://axios-http.com/docs/intro)
