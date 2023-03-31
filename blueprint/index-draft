@@ -5,39 +5,47 @@ indextype: blueprint
 icon: blueprint
 image: org-chart-explorer.png
 category: 5
-summary: Use the Users API resources to explore a Genesys Cloud Organization's org chart in a React app.
+summary: A React app can use the Users API to explore the organization chart of a Genesys Cloud Organization.
 ---
 
-The [Genesys Cloud Users API resources](/useragentman/users/) provide access to User configuration data. In this blueprint, we'll be focusing on the relationships between users as defined by a user's `manager`. The Genesys Cloud API will be used to retrieve the relationships between users as well as resolving user details for displaying in the app, such as the user's name, department, and profile picture. The app also demonstrates processing large queues of API requests and handling API rate limiting using a reactive approach.
+:::{"alert":"primary","title":"About Genesys Cloud Blueprints","autoCollapse":false} 
+Genesys Cloud blueprints were built to help you jump-start building an application or integrating with a third-party partner. 
+Blueprints are meant to outline how to build and deploy your solutions, not a production-ready turn-key solution.
+ 
+For more details on Genesys Cloud blueprint support and practices, 
+see our Genesys Cloud blueprint [FAQ](https://developer.genesys.cloud/blueprints/faq "Goes to the Genesys Cloud Blueprint FAQ page") sheet.
+:::
+
+[Genesys Cloud Users API resources](/useragentman/users/) provide access to User configuration data. The relationship between users is defined by their `manager` in this blueprint. The Genesys Cloud API retrieves user relationships and details about users, including their name, department, and profile picture. Using a reactive approach, the app also handles large API queues and rate limits.
 
 :::info
-Try this blueprint live in your browser with your org's data, no setup required! Hosted using Github Pages: [https://genesyscloudblueprints.github.io/org-chart-explorer/](https://genesyscloudblueprints.github.io/org-chart-explorer/).
+This blueprint is live in your browser with your org's data. No setup is required! The following Github Pages are used to host the service: [https://genesyscloudblueprints.github.io/org-chart-explorer/](https://genesyscloudblueprints.github.io/org-chart-explorer/).
 :::
 
 ![Org Chart Explorer](org-chart-explorer.png)
 
 ## Scenario
 
-Custom applications may be interested in understanding the managerial relationships between users in Genesy Cloud. This use case requires identifying a user as a starting point, then obtaining the user's upward management chain (superiors) and the organizational tree below them (direct reports). 
+Custom applications may be interested in knowing how users are managed in Genesys Cloud. The use case identifies a user, then obtains their management chain (superiors) and the organizational tree below them (direct reports). 
 
 ## Solution
 
-This blueprint explains how to use the following Genesys Cloud concepts:
+The following Genesys Cloud concepts are explained in this blueprint:
 
-* [Genesys Cloud OAuth Implicit Grant](/authorization/platform-auth/use-implicit-grant) - Using OAuth's implicit grant to authorize 3rd party applications to use the Genesys Cloud Platform API
-* [Genesys Cloud Users API](/useragentman/users/) - Platform API endpoints for working with Genesys Cloud user configuration
-* Rate Limiting - handling rate limiting as an expected feature of the Platform API
+* [Genesys Cloud OAuth Implicit Grant](/authorization/platform-auth/use-implicit-grant) - Using the implicit grant of OAuth to authorize third-party applications to use the Genesys Cloud Platform API.
+* [Genesys Cloud Users API](/useragentman/users/) - A platform API endpoint for configuring Genesys Cloud users.
+* Rate Limiting - The Platform API supports rate limiting as a standard feature.
 
 ## Solution Components
 
-* [React](https://react.dev/) - a popular frontend web application framework
-* [Genesys Cloud Platform API](/platform/api/) - the REST API for Genesys Cloud
+* [React](https://react.dev/) - An application framework for developing frontend web applications.
+* [Genesys Cloud Platform API](/platform/api/) -Genesys Cloud REST API.
 
 ## Software Development Kits
 
-This blueprint interacts with the Genesys Cloud API directly without the usage of the [JavaScript Platform Client SDK](/devapps/sdk/docexplorer/purecloudjavascript/). This was primarialy an architectural decision due to a new behavior in React 18 relating to dependency processing with webpack. The short description is that the SDK unfortunatley requires some node.js polyfills and React's webpack config doesn't handle this automatically anymore and now requires ejecting to edit the webpack config. For prior versions of React, usage was fairly straightforward, as demonstrated in the blueprint [Develop a React app with Typescript that uses the Genesys Cloud Platform SDK](/blueprints/react-app-with-genesys-cloud-sdk/). Future iterations of the JS SDK intend to remedy this situation with a more web-friendly package.
+This blueprint interacts directly with the Genesys Cloud API directly without the the need to use the [JavaScript Platform Client SDK](/devapps/sdk/docexplorer/purecloudjavascript/). A new behavior in React 18 relating to dependency processing with webpack led to this architectural decision. Unfortunately, the SDK requires some node.js polyfills, and React's webpack configuration no longer handles this automatically and requires ejecting to edit. Prior versions of React were fairly straightforward to use, as demonstrated in the blueprint [Develop a React app with Typescript that uses the Genesys Cloud Platform SDK](/blueprints/react-app-with-genesys-cloud-sdk/). A more web-friendly package is planned for future iterations of the JS SDK.
 
-The API types in `app/src/helpers/GenesysCloudAPITypes.ts` were copied from the JavaScript SDK's `index.d.ts` file to make use of the SDK's model types even though the SDK itself wasn't used.
+The API types in `app/src/helpers/GenesysCloudAPITypes.ts` were copied from the JavaScript SDK's `index.d.ts` so that the SDK's model types could be used without using the SDK.
 
 ## Prerequisites
 
@@ -48,52 +56,52 @@ The API types in `app/src/helpers/GenesysCloudAPITypes.ts` were copied from the 
 
 ### Genesys Cloud account
 
-* A Genesys Cloud license. For more information see, [Genesys Cloud Pricing](https://www.genesys.com/pricing "Opens the Genesys Cloud pricing page") in the Genesys website. 
+* A Genesys Cloud license. For more information see, [Genesys Cloud Pricing](https://www.genesys.com/pricing "Opens the Genesys Cloud pricing page") on the Genesys Cloud website. 
 
 ### Development tools running in your local environment
 
-* [NodeJS](https://nodejs.org/) - app uses v18
+* [NodeJS](https://nodejs.org/) - App uses v18.
 
 ## Application Overview
 
-The web application is a client side app built using [TypeScript](https://www.typescriptlang.org/) and [React](https://reactjs.org/). The source code for the app is open source and can be found on GitHub in [org-chart-explorer/app](https://github.com/GenesysCloudBlueprints/org-chart-explorer/tree/main/app).
+[TypeScript](https://www.typescriptlang.org/) and [React](https://reactjs.org/) are used to build the client side web application. This app's source code is located in the repository [org-chart-explorer/app](https://github.com/GenesysCloudBlueprints/org-chart-explorer/tree/main/app) on GitHub.
 
 :::info
-Try this blueprint live in your browser with your org's data, no setup required! Hosted using Github Pages: [https://genesyscloudblueprints.github.io/org-chart-explorer/](https://genesyscloudblueprints.github.io/org-chart-explorer/).
+You can try this blueprint live in your browser using your organization's data, no setup needed! This site is hosted on the following pages: [https://genesyscloudblueprints.github.io/org-chart-explorer/](https://genesyscloudblueprints.github.io/org-chart-explorer/) on GitHub.
 :::
 
-### Running Locally
+### Running locally
 
-The app is run locally using React's built-in local server. In your local shell, switch to the `app` directory and install dependencies:
+The app runs locally using React's built-in local server. In your local shell, change to the `app` directory and install the following dependencies:
 
 ```sh
 cd app
 npm i
 ```
 
-Then start the service:
+You can then start the service by following these steps:
 
 ```sh
 npm run start
 ```
 
-If you didn't change the default port, the app will be available locally on your machine at http://localhost:3000/.
+In the default scenario, the application will be available locally on your machine at http://localhost:3000/ if no port was changed.
 
 ### Dependencies
 
-Before digging into the application itself, here are some notable packages used by the app and what they do:
+The following are some notable packages used by the app and what they do before we get into the application:
 
-* [Genesys React Components](https://purecloudlabs.github.io/genesys-react-components/) - a set of open source React components built by Genesys, primarialy used by the Developer Center's frontend app
-* [Genesys Dev Icon Pack](https://purecloudlabs.github.io/genesys-dev-icon-pack/) - an open source web icon pack built by Genesys, similar in spirit to something like Font Awesome but with icons purpose-built for the Developer Center's frontend app.
-* [React Router](https://reactrouter.com/) - a library for React to manage URL-based routing within a single page app
-* [Recoil](https://recoiljs.org/) - a state management library for React, but less opinionated than Redux and offers a shim to interact with state objects outside of components via [recoil-nexus](https://www.npmjs.com/package/recoil-nexus)
-* [axios](https://axios-http.com/docs/intro) - a HTTP client
+* [Genesys React Components](https://purecloudlabs.github.io/genesys-react-components/) - An open source set of React components developed by Genesys, mainly used by the Developer Center's front-end application.
+* [Genesys Dev Icon Pack](https://purecloudlabs.github.io/genesys-dev-icon-pack/) - An open source web icon pack developed by Genesys, similar to Font Awesome but with icons created specifically for the Developer Center's front-end app.
+* [React Router](https://reactrouter.com/) - A library for React to manage URL-based routing on a single page app.
+* [Recoil](https://recoiljs.org/) - A state management library for React, but less opinionated than Redux. The library provides a shim to interact with state objects outside of components via [recoil-nexus](https://www.npmjs.com/package/recoil-nexus).
+* [axios](https://axios-http.com/docs/intro) - A HTTP client.
 
-## App Authorization
+## App authorization
 
-The first thing the app must do is become authorized. This is accomplished by allowing the user to choose their region using a dropdown in the header, then prompting the user to initiate the auth flow if the app does not have a valid auth token. See `app/src/App.tsx` for the implementation in the UI.
+The app must first become authorized. A drop-down in the header allows the user to choose their region, and if the app does not have a valid auth token, the user is prompted to initiate the auth flow. `app/src/App.tsx` contains the UI implementation.
 
-The app uses Genesys Cloud OAuth authorization ([implicit grant](/authorization/platform-auth/use-implicit-grant)) to authorize the app to make API requests. When the user clicks the link to begin the flow, the following function is executed to navigate the user to the Genesys Cloud auth server to be challenged for their credentials.  
+To authorize the app to make API requests, it uses an ([implicit grant](/authorization/platform-auth/use-implicit-grant)) within Genesys Cloud OAuth. Upon clicking the link, the following function is executed to navigate the user to the Genesys Cloud auth server to challenge their credentials.  
 
 ```typescript
 export function InitiateAuthFlow(region: string) {
@@ -108,25 +116,25 @@ export function InitiateAuthFlow(region: string) {
 }
 ```
 
-The user is redirected away from the app to complete authentication and is then redirected back to the app with an access token in the URI's fragment (also known as a the "hash"). The [`GenesysCloudAPI`](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/app/src/helpers/GenesysCloudAPI.ts) class is loaded during the initial app load and its constructor checks the fragment for an access token. If it finds one, the access token is set to a variable on the class instance and the fragment is cleared to review the token from view of the user. 
+TOnce the user completes authentication, they are redirected back to the app with an access token in the fragment URI (also called a "hash"). During initialization, [`GenesysCloudAPI`](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/app/src/helpers/GenesysCloudAPI.ts) cis loaded and its constructor checks the fragment for an access token. This is accomplished by setting the access token to a variable on the class instance and clearing the fragment so that the token is no longer visible to the user. 
 
-When the authorization check is performed, it will use the token obtained in the constructor to make a request to [GET /api/v2/users/me](/devapps/api-explorer#get-api-v2-users-me). If that request is successful, the app's initialization will continue in the context of the user returned from that request. This user information is stored in the user data atom (global state object), accessible via the `useUserData()` hook. If the request fails, this result will trigger the `useAuthFailed()` hook and the user will be presented with a prompt to log in.
+When the authorization check is performed, it uses the token obtained from [GET /api/v2/users/me](/devapps/api-explorer#get-api-v2-users-me). When the request is successful, the app will start in the context of the user returned by the request. The user data atom (global state object) stores this information and is accessible via the `useUserData()` hook. IThis result triggers the `useAuthFailed()` hook and prompts the user to log in if the request fails.
 
-## Loading and Displaying Data
+## Loading and displaying data
 
-When valid authorization is confirmed, the `App` component will display the `OrgChartApp` instead of the prompt to log in. The app initially focuses on the authenticated user and begins loading their superiors and direct reports.
+When valid authorization is confirmed, the `App` component displays `OrgChartApp` instead of the log in prompt. The app initially loads superiors and direct reports of the authenticated user.
 
-The `OrgChart` component is the initiator of the data loading. When the target user is set, an effect is triggered that uses the API to fetch the user's superiors and loads the target user as the initial user for an `OrgChartMember` component. The superiors are mapped as a vertical tree above the target user.
+The `OrgChart` component starts the data loading process. When the target user has been set, an effect is triggered that fetches the user's superiors using the API. The target user is loaded as the initial user for an `OrgChartMember` component. The superiors are mapped as a vertical tree above the target user.
 
-The `OrgChartMember` component is responsible for orchestrating the display of a user's information in the org chart. The user in context is displayed in a `UserCard` component. The component also uses the API to load the direct reports of a user asychronously. When the direct reports are loaded, they are displayed under the user in a recursive usage of the `OrgChartMember` component. 
+The `OrgChartMember` component displays user information in the org chart. The user in context is displayed in a `UserCard` component. A user's direct reports are also loaded asychronously using the API. As direct reports are loaded, they are displayed under the user in a recursive manner using the `OrgChartMember` component. 
 
-### The `GenesysCloudAPI` Class
+### The `GenesysCloudAPI` class
 
-In lieu of the SDK's out-of-the-box methods, a purpose-built class was created to encapsulate the Genesys Cloud API usage that separates data loading concerns from presentation and business logic contained in the React components. This class also provides Recoil atoms that it updates as appropriate to trigger React state events within the app as a result of asynchronous API operations. The class can be found in the project at `app/src/helpers/GenesysCloudAPI.ts`.
+Genesys Cloud API usage was encapsulate in a purpose-built class rather than an out-of-the-box method, which separates presentation and business logic contained in the React components from data loading concerns. The class also provides Recoil atoms that it updates to trigger React state events in the app. This results from asynchronous API operations. You can find this class in the project directory within `app/src/helpers/GenesysCloudAPI.ts`.
 
-### Getting Superiors
+### Getting superiors
 
-The API class provides an async method `GetSuperiors(userId: string)` that loads the list of superiors from the API using `GET /api/v2/users/{userId}/superiors`. This returns an array of users representing the full superiors chain above the user, with their direct supervisor (e.g. team lead) first in the list and most superior supervisor (e.g. CEO) last. Give it a try with your user using the API Explorer resource right here! 👇
+The API class provides an async method `GetSuperiors(userId: string)` that loads the list of superiors from the API by `GET /api/v2/users/{userId}/superiors`. TThe result is an array of users representing the entire superiors chain with the direct supervisor (e.g., team lead) at the top of the list and the most superior supervisor (e.g., CEO) at the bottom. Take a look at the the API Explorer resource here and give it a try with your user! 👇
 
 <dxui:OpenAPIExplorer verb="get" path="/api/v2/users/{userId}/superiors" />
 
@@ -147,11 +155,11 @@ public async GetSuperiors(userId: string) {
 }
 ```
 
-### Getting Direct Reports
+### Getting direct reports
 
-A user's direct reports are fetched from the API using `GET /api/v2/users/{userId}/directreports`. Unlike the superiors resource, this only returns a single level of user data. Because of this, the `OrgChartMember` loads itself recursively for each user so each instance can load the direct reports for each user recursively. This allows the app to shake out the full org chart as each user's subordinates are discovered.
+A user's direct reports can be fetched from the API using the request `GET /api/v2/users/{userId}/directreports`. A single level of user data is returned, unlike the superiors resource. Because of this, the `OrgChartMember` loads itself recursively for each user so that each instance can load the direct reports for each user recursively. As each user's subordinates are discovered, the the app can shake out the entire org chart.
 
-Try getting your direct reports using the API Explorer resource right here! 👇
+Take a look at the API Explorer resource here to get your direct reports! 👇
 
 <dxui:OpenAPIExplorer verb="get" path="/api/v2/users/{userId}/directreports" />
 
@@ -174,14 +182,14 @@ public async GetDirectReports(userId: string) {
 ```
 
 :::info
-It should be noted that this approach to lazy-loading the direct reports across the tree using components is a design pattern that's common in React, but may not be suited to all use cases or UI frameworks. Components are meant to be self-contained in that they are given the key properties they need when initialized and then the component is expected to know how to satisfy all of its needs to be able to render itself. This yields an experience where the UI loads partially and continues updating as more data becomes available. An equally valid approach would be to build the full reporting structure and show a loading placeholder until the tree is fully resolved. This approach would be especially useful for use cases where the org chart is processed as a whole to extract information about relationships across its structure.
+The use of components to lazy load reports across the tree is common in React, but may not be applicable to all use cases or UI frameworks. Components are intended to be self-contained, given all of the key properties they need when they are initialized, and then expected to satisfy all of their own needs to render. This results ina partially loaded UI that updates as more data is available. A similar approach is to build the full reporting structure and show a loading placeholder until the tree is fully resolved. Using this approach would be especially useful for extracting information about relationships across an organization's org chart as a whole.
 :::
 
-### Displaying Direct Reports as CSV Data
+### Displaying direct reports as CSV data
 
 The `OrgChart` component  has an additional feature to display the list of direct reports as CSV data. It makes use of the `useSubReports()` hook to get a list of all loaded subreports, then uses the data to prepare a CSV file including each direct report's name, department, title, email address, and manager's name. This data comes from `subReportsAtom` in `GenesysCloudAPI`. This atom is updated by the API class when results are retrieved using the `GetDirectReports` function. 
 
-### Rate Limit Retryer
+### Rate limit retryer
 
 The API class contains a function `rateLimitRetryer(requestFunc: {(): Promise<AxiosResponse<any, any>>}): Promise<AxiosResponse<any, any>>`. This function accepts a function that when executed will make a request to the API and return an axios response object. This wrapper process will add the function to a queue of requests, then a pool of processors will execute the function and check the response codes for rate limiting. When rate limited responses are encountered (HTTP 429 status code), the processor will sleep for the prescribed amount of time and then retry the request.
 
