@@ -5,7 +5,8 @@ indextype: blueprint
 icon: blueprint
 image: org-chart-explorer.png
 category: 5
-summary: A React app can use the Users API to explore the organization chart of a Genesys Cloud Organization.
+summary: |
+This Genesys Cloud Developer blueprint, [Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Goes to the User API page") provides access to user configuration data and a users' relationship is defined by their `manager`. The Genesys Cloud API retrieves user relationships and details about users, including their name, department, and profile picture. Using a reactive approach, the app handles large API queues and rate limits.
 ---
 
 :::{"alert":"primary","title":"About Genesys Cloud Blueprints","autoCollapse":false} 
@@ -16,7 +17,7 @@ For more details on Genesys Cloud blueprint support and practices,
 see our Genesys Cloud blueprint [FAQ](https://developer.genesys.cloud/blueprints/faq "Opens the Genesys Cloud Blueprint FAQ page") sheet.
 :::
 
-[Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Goes to the User API page") provide access to User configuration data. Users' relationship is defined by their `manager` in this blueprint. The Genesys Cloud API retrieves user relationships and details about users, including their name, department, and profile picture. Using a reactive approach, the app handles large API queues and rate limits.
+This Genesys Cloud Developer Blueprint, [Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Goes to the User API page") provides access to user configuration data and a users' relationship is defined by their `manager`. The Genesys Cloud API retrieves user relationships and details about users, including their name, department, and profile picture. Using a reactive approach, the app handles large API queues and rate limits.
 
 :::info
 This blueprint is live in your browser with your org's data. No setup is required! The following Github pages are used to host the service: [https://genesyscloudblueprints.github.io/org-chart-explorer/](https://genesyscloudblueprints.github.io/org-chart-explorer/ "Opens the Genesys Cloud blueprints page").
