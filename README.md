@@ -6,4 +6,4 @@ This Genesys Cloud Developer Blueprint, [Genesys Cloud Users API](https://develo
 
 You can view the complete blueprint and download the sample files from [here](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/blueprint/index-draft "Opens in the Org Chart Explorer page") in GitHub.
 
-[Org Chart Explorer](org-chart-explorer.png "Org Chart Explorer")
+![Org Chart Explorer](org-chart-explorer.png "Org Chart Explorer")
