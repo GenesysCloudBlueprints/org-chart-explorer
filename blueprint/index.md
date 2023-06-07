@@ -6,7 +6,7 @@ icon: blueprint
 image: org-chart-explorer.png
 category: 5
 summary: |
-This Genesys Cloud Developer blueprint, [Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Goes to the User API page") provides access to user configuration data and a users' relationship is defined by their `manager`. The Genesys Cloud API retrieves user relationships and details about users, including their name, department, and profile picture. Using a reactive approach, the app handles large API queues and rate limits.
+  This Genesys Cloud Developer blueprint, [Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Goes to the User API page") provides access to user configuration data and a users' relationship is defined by their `manager`. The Genesys Cloud API retrieves user relationships and details about users, including their name, department, and profile picture. Using a reactive approach, the app handles large API queues and rate limits.
 ---
 
 :::{"alert":"primary","title":"About Genesys Cloud Blueprints","autoCollapse":false} 
