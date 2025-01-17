@@ -33,7 +33,7 @@ Custom applications want to know how users are managed in Genesys Cloud. The use
 
 The blueprint explains the following Genesys Cloud concepts:
 
-* [Genesys Cloud Grant - Implicit](/https://developer.genesys.cloud/authorization/platform-auth/use-implicit-grant "Opens the Grant - Implicit page") - Using the implicit grant of OAuth to authorize third-party applications to use the Genesys Cloud Platform API.
+* [Genesys Cloud Grant - Implicit](https://developer.genesys.cloud/authorization/platform-auth/use-implicit-grant "Opens the Grant - Implicit page") - Using the implicit grant of OAuth to authorize third-party applications to use the Genesys Cloud Platform API.
 * [Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Opens the Genesys Cloud Users API page") - A platform API endpoint for configuring Genesys Cloud users.
 * Rate Limiting - The Platform API supports rate limiting as a standard feature.
 
