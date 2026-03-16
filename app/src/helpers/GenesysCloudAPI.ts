@@ -4,6 +4,8 @@ import { getRecoil, setRecoil } from 'recoil-nexus';
 import { User, UserSearchRequest, UsersSearchResponse } from './GenesysCloudAPITypes';
 
 const ACCESS_TOKEN_KEY = 'access-token';
+const CODE_VERIFIER_KEY = 'pkce-code-verifier';
+const CODE_EXCHANGE_IN_PROGRESS_KEY = 'code-exchange-in-progress';
 const MAX_QUEUE_FUNCS = 10;
 
 interface RetryableRequestFunc {
@@ -32,24 +34,27 @@ export default class GenesysCloudAPI {
 		// Retrieve existing access token
 		this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
 
-		// Parse fragment
-		if (window.location.hash) {
-			// Inspired by https://stackoverflow.com/questions/5646851/split-and-parse-window-location-hash
-			let hash = window.location.hash;
-			if (hash.startsWith('#')) hash = hash.substring(1);
-			const hashData: { [key: string]: string } = hash
-				.split('&')
-				.map((v) => v.split('='))
-				.reduce((pre, [key, value]) => ({ ...pre, [key]: value }), {});
+		// Parse query parameters for authorization code
+		const urlParams = new URLSearchParams(window.location.search);
+		const authCode = urlParams.get('code');
 
-			// Scrape access token
-			if (hashData.access_token) {
-				this.accessToken = hashData.access_token;
-				window.localStorage.setItem(ACCESS_TOKEN_KEY, this.accessToken);
-			}
+		// Check if code exchange is already in progress (prevent duplicate exchanges)
+		const exchangeInProgress = sessionStorage.getItem(CODE_EXCHANGE_IN_PROGRESS_KEY);
 
-			// Remove fragment
-			window.location.hash = '';
+		if (authCode && !exchangeInProgress) {
+			// Mark exchange as in progress
+			sessionStorage.setItem(CODE_EXCHANGE_IN_PROGRESS_KEY, 'true');
+
+			// Exchange authorization code for access token
+			this.exchangeCodeForToken(authCode, region).then(() => {
+				// Remove code from URL
+				window.history.replaceState({}, document.title, window.location.pathname);
+				// Clear the in-progress flag
+				sessionStorage.removeItem(CODE_EXCHANGE_IN_PROGRESS_KEY);
+			}).catch((error) => {
+				console.error('Token exchange failed:', error);
+				sessionStorage.removeItem(CODE_EXCHANGE_IN_PROGRESS_KEY);
+			});
 		}
 
 		// Create API client
@@ -159,6 +164,49 @@ export default class GenesysCloudAPI {
 
 	/////// PRIVATE METHODS ///////
 
+	private async exchangeCodeForToken(code: string, region: string) {
+		const codeVerifier = localStorage.getItem(CODE_VERIFIER_KEY);
+
+		if (!codeVerifier) {
+			console.error('Code verifier not found in localStorage');
+			return;
+		}
+
+		try {
+			const tokenUrl = `https://login.${region}/oauth/token`;
+
+			const params = new URLSearchParams({
+				grant_type: 'authorization_code',
+				code: code,
+				redirect_uri: process.env.REACT_APP_GENESYS_CLOUD_REDIRECT_URI || '',
+				client_id: process.env.REACT_APP_GENESYS_CLOUD_CLIENT_ID || '',
+				code_verifier: codeVerifier,
+				code_challenge_method: 'S256',
+			});
+
+			const response = await axios.post(tokenUrl, params.toString(), {
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+			});
+
+			if (response.data.access_token) {
+				const token = response.data.access_token as string;
+				this.accessToken = token;
+				localStorage.setItem(ACCESS_TOKEN_KEY, token);
+				localStorage.removeItem(CODE_VERIFIER_KEY);
+
+				// Update axios instance with new token
+				this.api.defaults.headers['Authorization'] = `Bearer ${token}`;
+
+				// Reload the page to reinitialize with the new token
+				window.location.reload();
+			}
+		} catch (error) {
+			console.error('Error exchanging code for token:', error);
+		}
+	}
+
 	private async rateLimitRetryer(requestFunc: { (): Promise<AxiosResponse<any, any>> }) {
 		return new Promise<AxiosResponse<any, any>>((resolve) => {
 			this.requestQueue.push({
@@ -237,16 +285,50 @@ export default class GenesysCloudAPI {
 	}
 }
 
-// InitiateAuthFlow redirects the user's browser to the Genesys Cloud authorization server to begin the OAuth flow
-export function InitiateAuthFlow(region: string) {
+// InitiateAuthFlow redirects the user's browser to the Genesys Cloud authorization server to begin the OAuth flow with PKCE
+export async function InitiateAuthFlow(region: string) {
+	// Generate PKCE code verifier and challenge
+	const codeVerifier = generateCodeVerifier();
+	const codeChallenge = await generateCodeChallenge(codeVerifier);
+	
+	// Store code verifier for later use
+	localStorage.setItem(CODE_VERIFIER_KEY, codeVerifier);
+
 	const oauthURL =
 		`https://login.${region}/oauth/authorize` +
 		`?client_id=${encodeURIComponent(process.env.REACT_APP_GENESYS_CLOUD_CLIENT_ID || '')}` +
-		`&response_type=token` +
-		`&redirect_uri=${encodeURIComponent(process.env.REACT_APP_GENESYS_CLOUD_REDIRECT_URI || '')}`;
+		`&response_type=code` +
+		`&redirect_uri=${encodeURIComponent(process.env.REACT_APP_GENESYS_CLOUD_REDIRECT_URI || '')}` +
+		`&code_challenge=${encodeURIComponent(codeChallenge)}` +
+		`&code_challenge_method=S256`;
 
 	console.log('Initiating OAuth flow to', oauthURL);
 	window.location.href = oauthURL;
+}
+
+// generateCodeVerifier creates a random string for PKCE
+function generateCodeVerifier(): string {
+	const array = new Uint8Array(96);
+	crypto.getRandomValues(array);
+	return base64URLEncode(array);
+}
+
+// generateCodeChallenge creates a SHA-256 hash of the code verifier
+async function generateCodeChallenge(verifier: string): Promise<string> {
+	const encoder = new TextEncoder();
+	const data = encoder.encode(verifier);
+	const hash = await crypto.subtle.digest('SHA-256', data);
+	return base64URLEncode(new Uint8Array(hash));
+}
+
+// base64URLEncode encodes a Uint8Array to base64url format
+function base64URLEncode(array: Uint8Array): string {
+	let binary = '';
+	for (let i = 0; i < array.length; i++) {
+		binary += String.fromCharCode(array[i]);
+	}
+	const base64 = btoa(binary) || '';
+	return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 // timeout wraps setTimeout with a promise
