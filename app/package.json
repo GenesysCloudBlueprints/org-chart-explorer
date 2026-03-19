@@ -52,5 +52,14 @@
 	"devDependencies": {
 		"gh-pages": "^5.0.0"
 	},
-	"homepage": "/org-chart-explorer"
+	"homepage": "/org-chart-explorer",
+	"jest": {
+		"transformIgnorePatterns": [
+			"node_modules/(?!(axios|genesys-react-components|genesys-dev-icons|csv-stringify)/)"
+		],
+		"moduleNameMapper": {
+			"^axios$": "axios/dist/node/axios.cjs",
+			"^csv-stringify/browser/esm/sync$": "csv-stringify/dist/cjs/sync.cjs"
+		}
+	}
 }
