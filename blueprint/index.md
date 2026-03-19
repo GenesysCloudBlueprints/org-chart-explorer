@@ -33,7 +33,7 @@ Custom applications want to know how users are managed in Genesys Cloud. The use
 
 The blueprint explains the following Genesys Cloud concepts:
 
-* [Genesys Cloud Grant - Implicit](https://developer.genesys.cloud/authorization/platform-auth/use-implicit-grant "Opens the Grant - Implicit page") - Using the implicit grant of OAuth to authorize third-party applications to use the Genesys Cloud Platform API.
+* [Genesys Cloud Authorization Code Grant with PKCE](https://developer.genesys.cloud/authorization/platform-auth/use-authorization-code-grant "Opens the Authorization Code Grant page") - Using the authorization code grant with PKCE (Proof Key for Code Exchange) to securely authorize third-party applications to use the Genesys Cloud Platform API.
 * [Genesys Cloud Users API](https://developer.genesys.cloud/useragentman/users/ "Opens the Genesys Cloud Users API page") - A platform API endpoint for configuring Genesys Cloud users.
 * Rate Limiting - The Platform API supports rate limiting as a standard feature.
 
@@ -102,22 +102,31 @@ The following are some notable packages used by the app and what they do before 
 
 The app must first become authorized. A drop-down in the header allows the user to choose their region, and if the app does not have a valid auth token, the user is prompted to initiate the auth flow. `app/src/App.tsx` contains the UI implementation.
 
-To authorize the app to make API requests, it uses an [implicit grant](/authorization/platform-auth/use-implicit-grant "Opens the Grant - Implicit page") within Genesys Cloud OAuth. Upon clicking the link, the following function is executed to navigate the user to the Genesys Cloud auth server to challenge their credentials.  
+To authorize the app to make API requests, it uses [authorization code grant with PKCE](/authorization/platform-auth/use-authorization-code-grant "Opens the Authorization Code Grant page") within Genesys Cloud OAuth. PKCE (Proof Key for Code Exchange) provides enhanced security for public clients by preventing authorization code interception attacks. Upon clicking the link, the following function is executed to navigate the user to the Genesys Cloud auth server to challenge their credentials.  
 
 ```typescript
-export function InitiateAuthFlow(region: string) {
+export async function InitiateAuthFlow(region: string) {
+	// Generate PKCE code verifier and challenge
+	const codeVerifier = generateCodeVerifier();
+	const codeChallenge = await generateCodeChallenge(codeVerifier);
+	
+	// Store code verifier for later use
+	localStorage.setItem(CODE_VERIFIER_KEY, codeVerifier);
+
 	const oauthURL =
 		`https://login.${region}/oauth/authorize` +
 		`?client_id=${encodeURIComponent(process.env.REACT_APP_GENESYS_CLOUD_CLIENT_ID || '')}` +
-		`&response_type=token` +
-		`&redirect_uri=${encodeURIComponent(process.env.REACT_APP_GENESYS_CLOUD_REDIRECT_URI || '')}`;
+		`&response_type=code` +
+		`&redirect_uri=${encodeURIComponent(process.env.REACT_APP_GENESYS_CLOUD_REDIRECT_URI || '')}` +
+		`&code_challenge=${encodeURIComponent(codeChallenge)}` +
+		`&code_challenge_method=S256`;
 
-	console.log('Initiating OAuth flow to', oauthURL);
+	console.log('Initiating OAuth flow with PKCE to', oauthURL);
 	window.location.href = oauthURL;
 }
 ```
 
-Once the user completes authentication, they are redirected back to the app with an access token in the fragment URI (also called a "hash"). During initialization, [`GenesysCloudAPI`](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/app/src/helpers/GenesysCloudAPI.ts "Opens the Genesys Cloud Blueprints org chart explorer page") is loaded and its constructor checks the fragment for an access token. This is accomplished by setting the access token to a variable on the class instance. In addition, it clears the fragment so that the token is no longer visible to the user. 
+Once the user completes authentication, they are redirected back to the app with an authorization code in the query parameters. During initialization, [`GenesysCloudAPI`](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/app/src/helpers/GenesysCloudAPI.ts "Opens the Genesys Cloud Blueprints org chart explorer page") is loaded and its constructor checks for the authorization code. The code is then exchanged for an access token using the stored code verifier. This exchange happens server-side at the token endpoint, providing better security than the deprecated implicit grant flow.
 
 When the authorization check is performed, it uses the token obtained from [GET /api/v2/users/me](/devapps/api-explorer#get-api-v2-users-me "Opens the /api/v2/users/me page"). When the request is successful, the app will start in the context of the user returned by the request. The user data atom (global state object) stores this information and is accessible via the `useUserData()` hook. This result triggers the `useAuthFailed()` hook and prompts the user to log in if the request fails.
 
@@ -243,7 +252,7 @@ Great question! In JavaScript API requests are handled in a single thread, but A
 * [Genesys Cloud Platform API Overview](/platform/api/ "Opens the Genesys Cloud Platform API Overview page") in the Genesys Cloud Developer Center.
 * [Genesys Cloud Users API resources](/useragentman/users/ "Opens the Genesys Cloud User API resources page") in the Genesys Cloud Developer Center.
 * [org-chart-explorer](https://genesyscloudblueprints.github.io/org-chart-explorer/ "Opens the Genesys Cloud blueprint page") in GitHub.
-* [Genesys Cloud OAuth Grant Implicit](/authorization/platform-auth/use-implicit-grant "Opens the Genesys Cloud OAuth Grant Implicit page") in the Genesys Cloud Developer Center.
+* [Genesys Cloud Authorization Code Grant with PKCE](/authorization/platform-auth/use-authorization-code-grant "Opens the Genesys Cloud Authorization Code Grant page") in the Genesys Cloud Developer Center.
 * [React](https://react.dev/ "Opens the React page") on the React website.
 * [Download for Windows (x64)](https://nodejs.org/ "Opens the Download for Windows (x64) page") on the NodeJS website.
 * [TypeScript is JavaScript with syntax for types.](https://www.typescriptlang.org/ "Opens the TypeScript is JavaScript with syntax for types. page") on the TypeScript website. 
