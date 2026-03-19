@@ -1,5 +1,4 @@
 # Local History (VS Code extension)
 .history/
 
-# Environment variables
-app/.env
+

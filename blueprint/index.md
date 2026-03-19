@@ -126,7 +126,7 @@ export async function InitiateAuthFlow(region: string) {
 }
 ```
 
-Once the user completes authentication, they are redirected back to the app with an authorization code in the query parameters. During initialization, [`GenesysCloudAPI`](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/app/src/helpers/GenesysCloudAPI.ts "Opens the Genesys Cloud Blueprints org chart explorer page") is loaded and its constructor checks for the authorization code. The code is then exchanged for an access token using the stored code verifier. This exchange happens server-side at the token endpoint, providing better security than the deprecated implicit grant flow.
+Once the user completes authentication, they are redirected back to the app with an authorization code in the query parameters. During initialization, [`GenesysCloudAPI`](https://github.com/GenesysCloudBlueprints/org-chart-explorer/blob/main/app/src/helpers/GenesysCloudAPI.ts "Opens the Genesys Cloud Blueprints org chart explorer page") is loaded and its constructor checks for the authorization code. The code is then exchanged for an access token using the stored code verifier. This exchange happens server-side at the token endpoint, providing enhanced security for public clients.
 
 When the authorization check is performed, it uses the token obtained from [GET /api/v2/users/me](/devapps/api-explorer#get-api-v2-users-me "Opens the /api/v2/users/me page"). When the request is successful, the app will start in the context of the user returned by the request. The user data atom (global state object) stores this information and is accessible via the `useUserData()` hook. This result triggers the `useAuthFailed()` hook and prompts the user to log in if the request fails.
 
